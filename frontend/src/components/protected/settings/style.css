@@ -1,0 +1,28 @@
+.custom-input {
+    background-color: #333 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
+    resize: none;
+}
+.custom-change, .custom-delete {
+    background-color: #009dd1;
+    text-decoration: none;
+    color: #ffffff;
+    padding: 8px;
+    border-radius: 6px;
+    margin-right: 13px;
+    border: none;
+}
+.custom-delete {
+    background-color: #cb0c02;
+    border: none
+}
+
+@media (max-width: 430px) {
+    .custom-change, .custom-delete {
+        display: block;
+        margin-top: 16px;
+        margin-right: 0px;
+    }
+}

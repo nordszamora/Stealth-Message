@@ -1,0 +1,18 @@
+input[type="text"] {
+    background-color: #333 !important;
+    color: #ffffff !important;
+    outline: none !important;
+    box-shadow: none !important;
+    resize: none;
+}
+.custom-header {
+    padding: 6px;
+    color: #ffffff;
+    text-decoration: none;
+}
+.custom-header:hover {
+    color: #0000ff !important;
+}
+button.ml-2 {
+    margin-left: 10px;
+}

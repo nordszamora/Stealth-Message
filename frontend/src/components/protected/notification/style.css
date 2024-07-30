@@ -1,0 +1,28 @@
+.custom-notification {
+    background-color: #333;
+    text-decoration: none;
+    padding: 6px;
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: bold;
+    display: inline-block;
+    width: 20vw;
+    text-align: center;
+}
+.word-break {
+  background-color: #333;
+  color: #ffffff;
+  border-radius: 10px;
+  width: 400px;
+  word-break: break-word;
+}
+
+@media(max-width: 430px) {
+    .custom-notification {
+      width: 50vw;
+    }
+    .word-break {
+      width: 300px;
+    }
+}

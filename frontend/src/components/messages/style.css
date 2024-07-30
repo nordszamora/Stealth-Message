@@ -1,0 +1,13 @@
+.custom-input {
+    background-color: #333 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
+    resize: none;
+}
+.custom-input::placeholder {
+    color: #808080;
+}
+.custom-btn {
+    width: 100%;
+}
