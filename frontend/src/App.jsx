@@ -4,16 +4,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/page/Home";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
+import ResetRequest from "./components/reset_pass/ResetRequest";
+import ResetConfirmation from "./components/reset_pass/ResetConfirmation";
 import SendMessage from "./components/messages/SendMessage";
 import User from "./components/protected/User";
 import Notification from "./components/protected/notification/Notification";
 import ReadMessage from "./components/protected/notification/ReadMessage";
 import Settings from "./components/protected/settings/Settings";
-import ChangeName from "./components/protected/settings/ChangeName";
-import ChangeUsername from "./components/protected/settings/ChangeUsername";
-import ChangePassword from "./components/protected/settings/ChangePassword";
-import DeleteAccount from "./components/protected/settings/DeleteAccount";
-import IsAuthenticated from "./components/context/IsAuthenticatedContext";
 
 const router = createBrowserRouter([
   {
@@ -29,38 +26,30 @@ const router = createBrowserRouter([
     element: <Login />
   },
   {
+    path: '/reset_password',
+    element: <ResetRequest />
+  },
+  {
+    path: '/reset-confirmation/:token',
+    element: <ResetConfirmation />
+  },
+  {
     path: '/user',
-    element: <IsAuthenticated><User /></IsAuthenticated>
+    element: <User />
   },
   {
     path: '/user/notification',
-    element: <IsAuthenticated><Notification /></IsAuthenticated>
+    element: <Notification />
   },
+
   {
     path: '/user/notification/read/:key',
-    element: <IsAuthenticated><ReadMessage /></IsAuthenticated>
+    element: <ReadMessage />
   },
+  
   {
     path: '/user/settings',
-    element: <IsAuthenticated><Settings /></IsAuthenticated>,
-    children: [
-      {
-        path: 'change_name',
-        element: <ChangeName />
-      },
-      {
-        path: 'change_username',
-        element: <ChangeUsername />
-      },
-      {
-        path: 'change_password',
-        element: <ChangePassword />
-      },
-      {
-        path: 'delete_account',
-        element: <DeleteAccount />
-      }
-    ]
+    element: <Settings />
   },
   {
     path: '/secret/:secret',

@@ -10,7 +10,7 @@
     width: 20vw;
     text-align: center;
 }
-.word-break {
+.break-word {
   background-color: #333;
   color: #ffffff;
   border-radius: 10px;
@@ -22,7 +22,7 @@
     .custom-notification {
       width: 50vw;
     }
-    .word-break {
+    .break-word {
       width: 300px;
     }
 }

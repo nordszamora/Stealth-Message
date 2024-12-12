@@ -16,6 +16,7 @@ class UserSchema(ma.SQLAlchemySchema):
    name = fields.Str(required=True)
    message_key = fields.Str(required=False)
    username = fields.Str(required=True)
+   email = fields.Str(required=True)
    password = fields.Str(required=True)
 
    @validates('name')
@@ -30,6 +31,11 @@ class UserSchema(ma.SQLAlchemySchema):
 
        elif User.query.filter_by(username=value).first():
           raise ValidationError('* Username already taken.')
+   
+   @validates('email')
+   def validate_email(self, value):
+       if User.query.filter_by(email=value).first():
+          raise ValidationError('* Email already taken')
 
    @validates('password')
    def validate_password(self, value):

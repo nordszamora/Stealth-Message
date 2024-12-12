@@ -1,74 +1,48 @@
-import { useState, useEffect, useContext } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import Context from "../../context/Context";
-
+import { AUTH_SUCCESS } from '../../api/user/api';
+import { READ_MESSAGE } from '../../api/notification/api';
 import "./style.css";
 
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
-
 export default function ReadMessage() {
-   const [result, setResult] = useState('');
-   const [notfoundkey, setNotFoundKey] = useState('');
 
    // Extract the 'key' parameter from the URL
    const { key } = useParams();
 
-   // Context to access authentication status and loading state
-   const { Isauthenticated, loading } = useContext(Context);
+   // Response data from the AUTH_SUCCESS & READ_MESSAGE
+   const { data: IsAuth, isError: NotAuth, isLoading: IsAuthLoading } = AUTH_SUCCESS()
+   const { data: ReadMessage, isError: ReadMessageIssue, isLoading: LoadMessage } = READ_MESSAGE(key)
 
-   // Fetch the message
-   useEffect(() => {
-    async function fetchMessage() {
-      try {
-        const response = await axios.get(`${API_URL}/api/v1/message/${key}`, {
-           withCredentials: true 
-        });
-    
-        setResult(response.data.secret_message); 
-      } catch (error) {
-        setNotFoundKey(error.response.status === 404);
-      } 
-    }
-
-    fetchMessage(); 
-   }, [key]); 
-
+   // Check loading or error states and return null or navigate away as needed or render the "Not Found"
+   if(IsAuthLoading && LoadMessage) return null;
+   if(NotAuth) return <Navigate to='/signin/'/>;
+   if(ReadMessageIssue) return <h1 style={{color: 'white', textAlign: 'center'}} className="mt-2">Not Found</h1>;
+   
    return (
-     <>
-      <Container>
-        <Row>
-          <Col className="d-flex align-items-center justify-content-center">
-            {loading ? (
-              null // Show nothing while loading
-            ) : (
-              Isauthenticated ? (
+    <>
+      {
+        IsAuth?.isauth && (
+          <Container>
+            <Row>
+              <Col className="d-flex align-items-center justify-content-center">
                 <div>
-                  {!notfoundkey ? (
-                    <div>
-                      <h1 style={{color: 'white', textAlign: 'center'}} className="mt-2">Message</h1>
+                  <div>
+                    <h1 style={{color: 'white', textAlign: 'center'}} className="mt-2">Message</h1>
 
-                      <div className='word-break mt-5'>
-                        <p style={{color: 'white', textAlign: 'center', padding: '10px'}}>{result}</p>
-                      </div>
+                    <div className='break-word mt-5'>
+                      <p style={{color: 'white', textAlign: 'center', padding: '10px'}}>{ReadMessage?.secret_message}</p>
                     </div>
-                  ) : (
-                    <h1 style={{color: 'white', textAlign: 'center'}} className="mt-2">Not Found</h1>
-                  )}
+                  </div>
                 </div>
-              ) : (
-                <Navigate to={`/signin`} /> // Redirect to signin if not authenticated
-              )
-            )}
-          </Col>
-        </Row>
-      </Container>
-     </>
+              </Col>
+            </Row>
+          </Container>
+        )
+      }
+   </>
    );
 }

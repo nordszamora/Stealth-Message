@@ -1,64 +1,56 @@
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-
+import { useState, useEffect } from 'react';
+import { Navigate, Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 
+import { SIGNIN } from '../api/auth/api';
 import './style.css';
-
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
    const [validated, setValidated] = useState(false);
    const [username, setUsername] = useState('');
    const [password, setPassword] = useState('');
-   const [response, setResponse] = useState('');
-   const [error, setError] = useState('');
+   const [loading, setLoading] = useState(false);
+
+   // Mutation function for authentication
+   const {status, error, isError, mutate} = SIGNIN();
 
    // Form submission for authentication
-   async function login(e) {
+   function login(e) {
      e.preventDefault();
+     setLoading(true);
 
      const form = e.currentTarget; 
      if (form.checkValidity() === false) {
        e.stopPropagation();
-
+       setLoading(false);
+       
      } else {
-       try {
-         // Make an API request for login submission
-         const response = await axios.post(`${API_URL}/api/v1/login`, {
-            username: username,
-            password: password
-         },
-         {
-            withCredentials: true 
-         });
-
-         setResponse(response.statusText);
-       } catch (error) {
-         setError(error.response.data.message);
-      
-       } finally {
-         setTimeout(() => setError(''), 3000);
-       }
+      // Make an API request for authentication
+       mutate({username: username, password: password});
      }
 
-     setValidated(true);
+     setValidated(true); 
    }
+
+   // Handle mutation response for authentication
+   useEffect(() => {
+     if(isError) {
+       setLoading(false);
+     }
+   }, [isError]);
 
    // Component to display the response or error message
    function Response() {
      return (
        <div>
-         {response ? (
+         {status === 'success' ? (
            <Navigate to={`/user`} /> // Navigate to user page on successful response
          ) : (
            // Display error message in red if an error occurs
-           <p style={{color: 'red', textAlign: 'center'}}>{error}</p>
+           (error ? (<p style={{color: 'red', textAlign: 'center'}}>{error.response.data.message}</p>) : null)
          )}
        </div>
      );
@@ -100,12 +92,18 @@ export default function Login() {
                      Provide your password.
                   </Form.Control.Feedback>
                 </Form.Group>
-                <button type="submit" className="btn btn-primary mt-2">Signin</button>
+                <div className='mt-2'>
+                  <Link to={'/reset_password'} style={{textDecoration: 'none'}}>Reset Password</Link>
+                </div>
+
+                <button type="submit" className="btn btn-primary mt-3" disabled={loading}>
+                   {loading ? 'Please wait...' : 'Signin'}
+                </button>
               </Form>
              </div>
             </Col>
           </Row>
         </Container>
      </div>
-   )
+   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import Container from 'react-bootstrap/Container';
@@ -6,62 +6,69 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 
+import { SIGNUP } from '../api/auth/api';
 import './style.css';
-
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Register() {
    const [validated, setValidated] = useState(false);
    const [name, setName] = useState('');
    const [username, setUsername] = useState('');
+   const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
-   const [response, setResponse] = useState('');
-   const [error, setError] = useState('');
+   const [loading, setLoading] = useState(false);
+
+   // Mutation function for registration
+   const {status, error, isError, mutate} = SIGNUP();
 
     // Form submission for registration
    async function register(e) {
-     e.preventDefault(); 
+     e.preventDefault();
+     setLoading(true);
 
      const form = e.currentTarget;
      if (form.checkValidity() === false) {
        e.stopPropagation();
+       setLoading(false);
 
      } else {
-       try {
-         // Make an API request for registration submission
-         const response = await axios.post(`${API_URL}/api/v1/register`, {
-            name: name,
-            username: username,
-            password: password
-         });
-
-         setResponse(response.statusText);
-       } catch (error) {
-         setError(error.response.data);
-   
-       } finally {
-         setTimeout(() => setError(''), 3000);
-       }
+       // Make an API request for registration submission
+       mutate({name: name, username: username, email: email, password: password})
      }
 
      setValidated(true);
    }
 
+   // Handle mutation response for registration
+   useEffect(() => {
+      if(isError) {
+        setLoading(false);
+      }
+   }, [isError]);
+
    // Component to display the response or error messages
    function Response() {
      return (
        <div>
-         {response ? (
+         {status === 'success' ? (
            <Navigate to={`/signin`} /> // Navigate to signin page on successful response
          ) : (
            // Display error messages for each field in red if errors occur
-           <div>
-             <p style={{color: 'red', textAlign: 'center'}}>{error.name}</p>
-             <p style={{color: 'red', textAlign: 'center'}}>{error.username}</p>
-             <p style={{color: 'red', textAlign: 'center'}}>{error.password}</p>
-           </div>
+           (error ? (
+             <div>
+               <p style={{color: 'red', textAlign: 'center'}}>
+                  {error.response.data.name}
+               </p>
+               <p style={{color: 'red', textAlign: 'center'}}>
+                  {error.response.data.username}
+               </p>
+               <p style={{color: 'red', textAlign: 'center'}}>
+                  {error.response.data.email}
+               </p>
+               <p style={{color: 'red', textAlign: 'center'}}>
+                  {error.response.data.password}
+               </p>
+             </div>
+           ) : (null))
          )}
        </div>
      );
@@ -105,6 +112,20 @@ export default function Register() {
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId="exampleForm.ControlInput3">
+                    <Form.Label style={{color: 'white'}}>Email</Form.Label>
+                    <Form.Control 
+                      type="email" 
+                      value={email} 
+                      onChange={(e) => setEmail(e.target.value)} 
+                      required 
+                      className='custom-input'
+                    />
+                    <Form.Control.Feedback type="invalid">
+                       Please choose a email.
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Form.Group className="mb-3" controlId="exampleForm.ControlInput4">
                     <Form.Label style={{color: 'white'}}>Password</Form.Label>
                     <Form.Control 
                       type="password" 
@@ -118,7 +139,9 @@ export default function Register() {
                        Please choose a password.
                     </Form.Control.Feedback>
                   </Form.Group>
-                  <button type="submit" className="btn btn-primary mt-2">Signup</button>
+                  <button type="submit" className="btn btn-primary mt-2" disabled={loading}>
+                     {loading ? 'Please wait...' : 'Signup'}
+                  </button>
                 </Form>
               </div>
             </Col>
